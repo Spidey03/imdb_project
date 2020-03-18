@@ -1,0 +1,17 @@
+Movie
+    name
+    date
+    director - ForeignKey(Director)
+    cast - Many to Many(Actor)
+
+Director
+    name
+    about
+
+Actor
+    fname
+    lname
+    
+    dob
+
+
