@@ -10,13 +10,14 @@ def get_two_bar_plot_data_director_hits():
         SELECT m.name,
             m.collections,
             m.director_id,
-            AVG(collections)
+            AVG(collections) AS avg
         FROM imdb_movie AS m
-        WHERE 
+        WHERE
             m.collections IN (SELECT MAX(collections) FROM imdb_movie GROUP BY director_id)
-            
+
         GROUP BY director_id
-        ORDER BY director_id DESC;
+        ORDER BY avg DESC
+        LIMIT 10;
         """
     )
     lables,data1,data2,data3 = [],[],[],[]
@@ -35,7 +36,7 @@ def get_two_bar_plot_data_director_hits():
                 "data": data1,
                 "borderColor": "rgba(0, 123, 255, 0.9)",
                 "borderWidth": "0",
-                "backgroundColor": "rgba(0, 123, 255, 0.5)",
+                "backgroundColor": "red",
                 "fontFamily": "Poppins"
             },
             {
@@ -43,7 +44,7 @@ def get_two_bar_plot_data_director_hits():
                 "data": data2,
                 "borderColor": "rgba(0,0,0,0.09)",
                 "borderWidth": "0",
-                "backgroundColor": "hsla(252, 100%, 46%, 0.5)",
+                "backgroundColor": "Black",
                 "fontFamily": "Poppins"
             }
         ]
@@ -62,7 +63,7 @@ def get_area_plot_data_movie_year():
     data = execute_sql_query(
         """
             SELECT m.name,
-                strftime('%Y',m.date_of_release) AS year,
+                m.release AS year,
                 AVG(m.collections)
             FROM imdb_movie as m
             GROUP BY year;
@@ -73,7 +74,8 @@ def get_area_plot_data_movie_year():
         lables.append(item[0])
         data1.append(item[1])
         data2.append(item[2])
-
+    print(data1[:100])
+    print(data2[:100])
     area_plot_data = {
         "labels": data1,
         "type": 'line',
@@ -102,20 +104,20 @@ def get_pie_chart_data_gender():
 
 
     from imdb.models import Movie
-    fmale = Actor.objects.filter(gender = 'F').count()
-    male = Actor.objects.filter(gender = 'M').count()
+    fmale = Actor.objects.filter(gender = 'female').count()
+    male = Actor.objects.filter(gender = 'male').count()
     pie_chart_data = {
         "datasets": [{
             "data": [fmale,male],
             "backgroundColor": [
                 "rgba(123, 123, 255,0.9)",
-                "rgba(0, 123, 255,0.3)",
-                "rgba(0, 123, 255,0.5)",
+                "tomato",
+                "rgba(123, 123, 255,0.9)",
                 "rgba(0,0,0,0.07)"
             ],
             "hoverBackgroundColor": [
-                "rgba(0, 123, 255,0.9)",
-                "rgba(0, 123, 255,0.9)",
+                "rgba(0, 140, 255,0.9)",
+                "rgba(0, 140, 255,0.9)",
                 "rgba(0, 123, 255,0.5)",
                 "rgba(0,0,0,0.07)"
             ]
@@ -139,27 +141,26 @@ def get_doughnut_chart_data_genre():
     data,genre = [],[]
     for item in labels:
         data.append(Movie.objects.filter(genre = item).count())
-    for label in labels:
+    for label in labels[:5]:
         genre.append(label.name)
     doughnut_graph_data = {
         "datasets": [{
-            "data": data,
+            "data": data[:5],
             "backgroundColor": [
-                "rgba(0, 123, 255,0.9)",
-                "rgba(0, 123, 255,0.7)",
-                "rgba(0, 123, 255,0.5)",
+                "rgba(0, 123, 255,1.5)",
+                "maroon",
+                "orange",
+                "palevioletred",
+                "tomato",
+
                 "rgba(0,0,0,0.07)"
             ],
-            "hoverBackgroundColor": [
-                "rgba(0, 123, 255,0.9)",
-                "rgba(0, 123, 255,0.7)",
-                "rgba(0, 123, 255,0.5)",
-                "rgba(0,0,0,0.07)"
-            ]
+            "hoverBackgroundColor": "red"
+
 
         }],
         "labels": genre
-        
+
     }
 
     return {
@@ -173,8 +174,8 @@ def get_multi_line_plot_data_gender():
 
     years_list = execute_sql_query(
         """
-            SELECT 
-                strftime('%Y',date_of_release) AS year
+            SELECT
+                release AS year
             FROM imdb_movie
             GROUP BY year;
         """
@@ -184,7 +185,7 @@ def get_multi_line_plot_data_gender():
         """
             SELECT COUNT(DISTINCT(a.id)) as count,
                 a.gender,
-                strftime('%Y',m.date_of_release) AS year
+                release AS year
             FROM imdb_movie AS m
             INNER JOIN imdb_cast AS c
                 ON m.id = c.movie_id
@@ -199,7 +200,7 @@ def get_multi_line_plot_data_gender():
     years = []
     for year in years_list:
         years.append(year[0])
-    
+
     # for item in data:
     #     years.append(item[2])
 
@@ -208,7 +209,7 @@ def get_multi_line_plot_data_gender():
     for year in years:
         male_count.append([year,0])
         female_count.append([year,0])
-    
+
     print()
     print(male_count)
     print(female_count)
@@ -216,15 +217,15 @@ def get_multi_line_plot_data_gender():
 
     for year in years:
         for item in data:
-            if item[2] ==  year and item[1]=='M':
+            if item[2] ==  year and item[1]=='male':
                 for elem in male_count:
                     if year == elem[0]:
                         elem[1] = item[0]
-            elif item[2] ==  year and item[1]=='F':
+            elif item[2] ==  year and item[1]=='female':
                 for elem in female_count:
                     if year == elem[0]:
                         elem[1] = item[0]
-    
+
 
     print(male_count)
     print(female_count)
@@ -233,7 +234,7 @@ def get_multi_line_plot_data_gender():
 
     for count in male_count:
         final_male.append(count[1])
-    
+
 
     for count in female_count:
         final_female.append(count[1])
@@ -253,7 +254,7 @@ def get_multi_line_plot_data_gender():
             "pointRadius": 5,
             "pointBorderColor": 'transparent',
             "pointBackgroundColor": 'rgba(220,53,69,0.75)',
-        }, 
+        },
         {
             "label": "Female",
             "data": final_female,
@@ -295,7 +296,7 @@ def get_polar_chart_data_genre():
     data = [item[0] for item in coll]
     polar_chart_data = {
         "datasets": [{
-            "data": data,
+            "data": data[:5],
             # "backgroundColor": [
             #     "rgba(0, 123, 255,0.9)",
             #     "rgba(0, 123, 255,0.8)",
@@ -311,11 +312,18 @@ def get_polar_chart_data_genre():
                 'blue',
                 'tomato',
                 'orangered',
-                'orange'
+                'orange',
+                'darkorange',
+                'black',
+                'palevioletred',
+                'violet',
+                'pink',
+                'darkslategray',
+
             ]
 
         }],
-        "labels": labels
+        "labels": labels[:5]
     }
     return {
         'polar_chart_data_one': json.dumps(
@@ -332,9 +340,8 @@ def get_one_bar_plot_data_subscribers():
     subs = execute_sql_query(
         """
             SELECT SUM(no_of_subscribers) AS subs,
-                strftime('%Y', date_of_release) AS year
+                release AS year
             FROM imdb_movie
-            WHERE year > "(SELECT strftime('%Y', 'now')-10)"
             GROUP BY year;
         """
     )
@@ -343,15 +350,15 @@ def get_one_bar_plot_data_subscribers():
     subscribers = [item[0] for item in subs]
 
     single_bar_chart_data = {
-        "labels": years,
+        "labels": years[:-4],
         "datasets":[
             {
-                "data": subscribers,
+                "data": subscribers[:-4],
                 "name": "Single Bar Chart",
                 "borderColor": "rgba(0, 123, 255, 0.9)",
                 "border_width": "0",
                 "backgroundColor": "rgba(0, 123, 255, 0.5)"
-                
+
             }
         ]
     }

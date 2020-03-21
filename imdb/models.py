@@ -63,7 +63,7 @@ class Language(models.Model):
         return f'{self.name}'
         
 class Movie(models.Model):
-    id = models.CharField(max_length=200,primary_key=True)
+    # id = models.CharField(max_length=200,primary_key=True)
     name = models.CharField(max_length = 100)
     director = models.ForeignKey(
         'Director',

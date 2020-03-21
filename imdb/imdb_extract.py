@@ -1,19 +1,21 @@
 import json
-from imdb.models import *
-file = "/home/r/imdb_project/imdb/actors_5000.json"
-with open(file) as page:
-    # data = page.read()
-    data = json.loads()
+import requests
+import re
 
 
+file = "/home/r/Downloads/100_movies/movies_100.json"
+page = open(file,'r')
+data = page.read()
 
 
-# def populate_actors(data):
-#     for actor in actors_list:
-#         a = Actor.objects.create(
-#             full_name = actor['actor_id'],
-#             name = actor['name'],
-#             # age = actor['age'],
-#             # dob = actor['dob'],
-#             gender = actor['gender']
-#         )
+movies_list = json.loads(data)
+for movie in movies_list[:1]:
+
+    pattern = f"""<a href="{movie['imdb_link'][19:]}"(.+?)</a>"""
+    print(pattern)
+    pattern = re.compile(pattern)
+    print(movie['imdb_link'][19:])
+    
+    data = requests.get('http://www.imdb.com/title/tt0499549/?ref_=fn_tt_tt_1')
+    result = pattern.findall(data.text)
+    print(result)

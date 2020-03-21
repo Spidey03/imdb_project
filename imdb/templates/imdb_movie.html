@@ -28,8 +28,7 @@ The film was conceived by Rajamouli's father K. V. Vijayendra Prasad, who random
                 <tr>
                     <th>Actor id</th>
                     <th>Name</th>
-                    <th>Date of Birth</th>
-                    <th>Role</th>
+                    
                     <th></th>
                 </tr>
                 </thead>
@@ -40,10 +39,7 @@ The film was conceived by Rajamouli's father K. V. Vijayendra Prasad, who random
                     <td >
                         <a href="/imdb/actor/{{ actor.actor.id }}/">{{ actor.actor.name }}</a>
                     </td>
-                    <td>{{ actor.actor.dob }}</td>
-                    <td>
-                       {{ actor.role }}
-                    </td>
+                    
                 </tr>
                 <tr class="spacer"></tr>
                 {% endfor %}

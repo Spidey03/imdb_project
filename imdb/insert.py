@@ -427,18 +427,21 @@ movie_rating_list = [
 import json
 # Actors List
 file = "/home/r/imdb_project/imdb/complete_data/actors_5000.json"
+# file = "/home/r/imdb_project/imdb/100_movies/actors_100.json"
 page = open(file,'r')
 data = page.read()
 actors_list = json.loads(data)
 
 # Director List
 file = "/home/r/imdb_project/imdb/complete_data/directors_5000.json"
+# file = "/home/r/imdb_project/imdb/100_movies/directors_100.json"
 page = open(file,'r')
 data = page.read()
 directors_list = json.loads(data)
 
 # Movie List
 file = "/home/r/imdb_project/imdb/complete_data/movies_5000.json"
+# file = "/home/r/imdb_project/imdb/100_movies/movies_100.json"
 page = open(file,'r')
 data = page.read()
 movies_list = json.loads(data)
@@ -446,7 +449,7 @@ movies_list = json.loads(data)
 
 
 from imdb.models import *
-
+import uuid
 def populate_directors(directors_list):
     for director in directors_list:
         if director['no_of_facebook_likes'] == '':
@@ -470,12 +473,17 @@ def populate_actors(actors_list):
 
 def populate_movies(movies_list):
     for movie in movies_list:
+        if movie['year_of_release'] == '':
+            release = 0
+        else:
+            release = int(movie['year_of_release'])
+
         m = Movie.objects.create(
-            id = movie['movie_id'],
+            # id = uuid.uuid4(),
             name = movie['name'],
             director = Director.objects.get(name = movie['director_name']),
-            release = int(movie['release_date']),
-            collections = float(movie['collections']),
+            release = release,
+            collections = float(movie['box_office_collection_in_crores']),
             avg_rating = float(movie['average_rating']),
             no_of_subscribers = int(movie['no_of_users_voted']),
             language = movie['language']
@@ -487,7 +495,7 @@ def populate_movies(movies_list):
                 genre_obj = Genre.objects.create(name = genre)
             finally:
                 m.genre.add(genre_obj)
-        for actor in movie['actor']:
+        for actor in movie['actors']:
             Cast.objects.create(
                 actor = Actor.objects.get(full_name = actor['actor_id']),
                 movie = m,
@@ -500,7 +508,7 @@ def populate():
     populate_directors(directors_list)
     print('Populating Actors...')
     populate_actors(actors_list)
-    print('Inserting Movies')
+    print('Inserting Movies...')
     populate_movies(movies_list)
 
 

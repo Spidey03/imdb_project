@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-md-12">
         <!-- DATA TABLE -->
-        <h3 class="title-5 m-b-35">data table</h3>
+        <h3 class="title-5 m-b-35">Movies</h3>
         <div class="table-responsive table-responsive-data2">
             <table class="table table-data2">
                 <thead>
@@ -16,10 +16,10 @@
                     <th>Name</th>
                     <th>Director</th>
                     <th>Release Date</th>
-                    <th>Genre</th>
-                    <th>Language</th>
-                    <th>Average Rating</th>
+                    <th>Genre</th>  
                     <th>Collections(in Crores.)</th>
+                    <th>Average Rating</th>
+                    
                     <th></th>
                 </tr>
                 </thead>
@@ -33,7 +33,7 @@
                     <td class="desc">
                         <a href="/imdb/director/{{ movie.director.id }}/">{{ movie.director }}</a>
                     </td>
-                    <td>{{ movie.date_of_release }}</td>
+                    <td>{{ movie.release }}</td>
                     <td>
                         {% with flag as 1 %}
                         {% for genre in movie.genre.all %}
@@ -41,18 +41,14 @@
                         {% endfor %}
                         {% endwith %}
                     </td>
-                    <td>
-                        {% for lang in movie.language.all %}
-                            {{ lang }}
-                        {% endfor %}
-                    </td>
+                    <td>{{ movie.collections }}</td>
                     <td>
                         <span class="status--high">{{ movie.avg_rating }}</span>
                     </td>
-                    <td>{{ movie.collections }}</td>
                     <td>
                         <div class="table-data-feature">
                             <form method="post">
+                                <input type="hidden" name="movie" value = "{{ movie.id }}">
                                 {% csrf_token %}
                                 <button type="submit"
                                         class="item"
